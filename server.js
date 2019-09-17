@@ -8,7 +8,13 @@ const app = express();
 const cookie = require("cookie");
 
 const http = require("http").createServer(app);
-const io = require("socket.io")(http);
+
+http.listen(4000, "localhost", () => {
+   console.log("Running on port 4000 , 0.0.0.0");
+});
+
+const io = require("socket.io").listen(http);
+io.origins(['http://localhost:4000']);
 
 const gameEngine = require(__dirname + "/game-logic/gameEngine.js");
 const gameData = require(__dirname + "/game-logic/DATA.js");
@@ -21,6 +27,8 @@ const upload = multer({ dest: __dirname + "/assets/" }); // Set file upload dest
 const imagePath = "/assets/";
 const url =
    "mongodb+srv://admin:admin@samurai-murit.mongodb.net/test?retryWrites=true"; // URI for remote database!
+
+app.use(cors())
 
 app.use("/assets", express.static(__dirname + "/assets"));
 app.use(cookieParser());
@@ -762,7 +770,7 @@ io.on("connection", socket => {
 
    socket.on("disconnect", () => {
       let usercookie = cookie.parse(socket.request.headers.cookie);
-      let currentLobbyId = "";
+      var currentLobbyId = "";
       sessionsCollection
          .find({ sessionId: usercookie.sid })
          .toArray((err, result) => {
@@ -1135,28 +1143,28 @@ let checkVersion = async () => {
 checkVersion()`;
 
 //let generateId = () => "" + Math.floor(Math.random() * 10000000000);
-let __version = generateId();
-app.get("/__version", (req, res) => {
-   res.send(__version);
-});
+// let __version = generateId();
+// app.get("/__version", (req, res) => {
+//    res.send(__version);
+// });
 
-chokidar
-   .watch(__dirname + "/build", { ignored: /(^|[\/\\])\../ })
-   .on("all", (event, path) => {
-      webpackError = undefined;
-      __version = generateId();
-   });
+// chokidar
+//    .watch(__dirname + "/build", { ignored: /(^|[\/\\])\../ })
+//    .on("all", (event, path) => {
+//       webpackError = undefined;
+//       __version = generateId();
+//    });
 
-let webpackError = undefined;
-app.all("/*", (req, res, next) => {
-   if (webpackError) {
-      res.send(
-         "<h4>" + webpackError + "</h4><script>" + pollServer + "</script>"
-      );
-   } else {
-      next();
-   }
-});
+// let webpackError = undefined;
+// app.all("/*", (req, res, next) => {
+//    if (webpackError) {
+//       res.send(
+//          "<h4>" + webpackError + "</h4><script>" + pollServer + "</script>"
+//       );
+//    } else {
+//       next();
+//    }
+// });
 
 app.use("/", express.static("build"));
 app.all("/*", (req, res) => {
@@ -1164,13 +1172,13 @@ app.all("/*", (req, res) => {
 });
 let counter = 0;
 let setup = async () => {
-   const cmd = /^win/.test(process.platform) ? "npx.cmd" : "npx";
-   let webpack = spawn(cmd, ["webpack", "--watch", "--display", "errors-only"]);
-   webpack.stdout.on("data", data => {
-      webpackError = data.toString();
-   });
-   http.listen(4000, "0.0.0.0", () => {
-      console.log("Running on port 4000 , 0.0.0.0");
-   });
+   // const cmd = /^win/.test(process.platform) ? "npx.cmd" : "npx";
+   // let webpack = spawn(cmd, ["webpack", "--watch", "--display", "errors-only"]);
+   // webpack.stdout.on("data", data => {
+   //    webpackError = data.toString();
+   // });
+   // http.listen(4000, "134.209.119.133", () => {
+   //    console.log("Running on port 4000 , 0.0.0.0");
+   // });
 };
-setup();
+// setup();
